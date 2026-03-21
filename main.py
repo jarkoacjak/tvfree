@@ -3,12 +3,12 @@ import urllib.parse
 import xbmcgui
 import xbmcplugin
 
-# Základné nastavenia doplnku
+# Globálne premenné pre Kodi
 HANDLE = int(sys.argv[1])
 BASE_URL = sys.argv[0]
 
 def create_item(label, url, is_folder=False, icon=None):
-    """Pomocná funkcia na vytvorenie položky v zozname Kodi."""
+    """Vytvorí položku v zozname Kodi."""
     list_item = xbmcgui.ListItem(label=label)
     if icon:
         list_item.setArt({'icon': icon, 'thumb': icon})
@@ -20,37 +20,32 @@ def create_item(label, url, is_folder=False, icon=None):
     xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=list_item, isFolder=is_folder)
 
 def main_menu():
-    """Hlavná ponuka s výberom krajiny."""
-    sk_url = f"{BASE_URL}?action=list_sk"
-    cz_url = f"{BASE_URL}?action=list_cz"
-    
-    create_item("Slovenské TV", sk_url, is_folder=True)
-    create_item("České TV", cz_url, is_folder=True)
-    
+    """Zobrazí základný výber: Slovenské vs České."""
+    create_item("Slovenské TV", f"{BASE_URL}?action=list_sk", is_folder=True)
+    create_item("České TV", f"{BASE_URL}?action=list_cz", is_folder=False)
     xbmcplugin.endOfDirectory(HANDLE)
 
 def list_slovak_tv():
-    """Zoznam slovenských staníc - Pridaná TV JOJ."""
-    # User-Agent je dôležitý, aby stream v Kodi nabehol
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    joj_stream = f"https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8|User-Agent={user_agent}"
+    """Zoznam staníc pre Slovensko."""
+    # Tvoj funkčný link na TV JOJ
+    joj_url = "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8"
     
-    # Tvoje nové logo z odkazu
+    # Pridanie User-Agenta (Kodi ho potrebuje, aby server JOJ neodmietol spojenie)
+    user_agent = "|User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    full_stream_url = joj_url + user_agent
+    
+    # Tvoje logo (priamy odkaz na obrázok)
     joj_logo = "https://yt3.googleusercontent.com/8rPXBoj2l1nhd9C-DCXF-s3tx0i_36GJzJcxeMyYvyPpPNakQsyc5DYc5d_QLDeI74ILkmFSJQ=s900-c-k-c0x00ffffff-no-rj"
     
-    create_item("TV JOJ", joj_stream, is_folder=False, icon=joj_logo)
-    
+    create_item("TV JOJ", full_stream_url, is_folder=False, icon=joj_logo)
     xbmcplugin.endOfDirectory(HANDLE)
 
-def list_czech_tv():
-    """Funkcia pre České TV s upozornením o príprave."""
-    dialog = xbmcgui.Dialog()
-    dialog.notification('TV Free', 'Pripravujeme, pribudnú čoskoro!', xbmcgui.NOTIFICATION_INFO, 5000)
-    
-    # Ukončíme adresár bez pridania položiek
-    xbmcplugin.endOfDirectory(HANDLE, cacheToDisc=False)
+def show_cz_msg():
+    """Oznámenie pre české stanice."""
+    xbmcgui.Dialog().notification('TV Free', 'Pripravujeme, pribudnú čoskoro!', xbmcgui.NOTIFICATION_INFO, 5000)
 
-# Smerovanie požiadaviek podľa kliknutia používateľa
+# --- JADRO DOPLNKU (ROUTER) ---
+# Rozoberieme parametre, ktoré nám posiela Kodi pri kliknutí
 params = dict(urllib.parse.parse_qsl(sys.argv[2][1:]))
 action = params.get('action')
 
@@ -59,4 +54,5 @@ if not action:
 elif action == 'list_sk':
     list_slovak_tv()
 elif action == 'list_cz':
-    list_cz_tv() # Volanie funkcie pre české TV s oznamom
+    show_cz_msg()
+    
