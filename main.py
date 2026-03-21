@@ -1,64 +1,58 @@
 import sys
+import urllib.parse
 import xbmcgui
 import xbmcplugin
-import urllib.parse
 
-# Premenné pre Kodi
+# Globálne premenné
 HANDLE = int(sys.argv[1])
 BASE_URL = sys.argv[0]
 
+def create_item(label, url, is_folder=False, icon=None, is_playable=False):
+    """Vytvorí položku v zozname Kodi so všetkými potrebnými vlastnosťami."""
+    list_item = xbmcgui.ListItem(label=label)
+    if icon:
+        list_item.setArt({'icon': icon, 'thumb': icon, 'poster': icon})
+    
+    if is_playable:
+        list_item.setProperty('IsPlayable', 'true')
+        list_item.setInfo('video', {'title': label, 'mediatype': 'video'})
+        
+        # DÔLEŽITÉ: Toto povie Kodi, aby použilo správny prehrávač pre m3u8
+        list_item.setProperty('inputstream', 'inputstream.adaptive')
+        list_item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+        list_item.setContentLookup(False)
+
+    xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=list_item, isFolder=is_folder)
+
 def main_menu():
-    """Hlavné menu: Slovenské a České TV."""
-    # Slovenské TV
-    sk_item = xbmcgui.ListItem(label="Slovenské TV")
-    sk_url = f"{BASE_URL}?action=list_sk"
-    xbmcplugin.addDirectoryItem(handle=HANDLE, url=sk_url, listitem=sk_item, isFolder=True)
-    
-    # České TV
-    cz_item = xbmcgui.ListItem(label="České TV")
-    cz_url = f"{BASE_URL}?action=list_cz"
-    xbmcplugin.addDirectoryItem(handle=HANDLE, url=cz_url, listitem=cz_item, isFolder=False)
-    
+    """Hlavná ponuka."""
+    create_item("Slovenské TV", f"{BASE_URL}?action=list_sk", is_folder=True)
+    create_item("České TV", f"{BASE_URL}?action=list_cz", is_folder=False)
     xbmcplugin.endOfDirectory(HANDLE)
 
 def list_slovak_tv():
-    """Zoznam slovenských staníc."""
-    # Spoločné hlavičky (User-Agent je nutnosť pre servery JOJ)
-    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-    headers = f"|User-Agent={ua}&Referer=https://www.joj.sk/"
+    """Zoznam slovenských staníc s opravou hlavičiek."""
+    # HLAVIČKY: Bez nich JOJ stream v Kodi nepustí (User-Agent a Referer)
+    headers = "|User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36&Referer=https://www.joj.sk/&Origin=https://www.joj.sk"
 
     # 1. TV JOJ
     joj_url = "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8" + headers
-    joj_logo = "https://yt3.googleusercontent.com/8rPXBoj2l1nhd9C-DCXF-s3tx0i_36GJzJcxeMyYvyPpPNakQsyc5DYc5d_QLDeI74ILkmFSJQ=s900-c-k-c0x00ffffff-no-rj" # Logo z YouTube profilu
-    add_stream("TV JOJ", joj_url, joj_logo)
+    joj_logo = "https://upload.wikimedia.org/wikipedia/commons/e/ee/Logo_TV_JOJ_-_2020.svg"
+    create_item("TV JOJ", joj_url, is_folder=False, icon=joj_logo, is_playable=True)
 
     # 2. JOJ KRIMI
     krimi_url = "https://live.cdn.joj.sk/live/andromeda/wau-1080.m3u8" + headers
     krimi_logo = "https://img.telkac.zoznam.sk/data/images/channel/2026/03/04/image_new_137.thumb.png"
-    add_stream("JOJ Krimi", krimi_url, krimi_logo)
+    create_item("JOJ Krimi", krimi_url, is_folder=False, icon=krimi_logo, is_playable=True)
 
     xbmcplugin.endOfDirectory(HANDLE)
-
-def add_stream(name, url, logo):
-    """Pomocná funkcia na pridanie streamu do zoznamu."""
-    list_item = xbmcgui.ListItem(label=name)
-    list_item.setArt({'icon': logo, 'thumb': logo})
-    list_item.setInfo('video', {'title': name})
-    list_item.setProperty('IsPlayable', 'true')
-    
-    # Nastavenie pre InputStream Adaptive (nutné pre HLS/m3u8)
-    list_item.setProperty('inputstream', 'inputstream.adaptive')
-    list_item.setProperty('inputstream.adaptive.manifest_type', 'hls')
-    
-    xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=list_item, isFolder=False)
 
 def show_cz_msg():
     """Zobrazenie oznámenia pre České TV."""
     xbmcgui.Dialog().ok("TV Free", "Pripravujeme čoskoro!")
 
 # --- ROUTER (Logika prepínania akcií) ---
-query = sys.argv[2][1:]
-params = dict(urllib.parse.parse_qsl(query))
+params = dict(urllib.parse.parse_qsl(sys.argv[2][1:]))
 action = params.get('action')
 
 if action == 'list_sk':
