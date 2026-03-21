@@ -15,10 +15,13 @@ def create_item(label, url, icon=None, folder=False, playable=False):
     if playable:
         list_item.setProperty('IsPlayable', 'true')
         list_item.setInfo('video', {'title': label})
-        # AKTIVÁCIA PREHRÁVAČA (Toto musí byť v kóde!)
+        
+        # OCHRANA PROTI PÁDU: Zakážeme Kodi skúmať súbor pred spustením
+        list_item.setContentLookup(False)
+        
+        # Nastavenia pre prehrávač
         list_item.setProperty('inputstream', 'inputstream.adaptive')
         list_item.setProperty('inputstream.adaptive.manifest_type', 'hls')
-        list_item.setProperty('inputstream.adaptive.stream_selection_type', '0')
 
     xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=list_item, isFolder=folder)
 
@@ -28,7 +31,7 @@ def main_menu():
     xbmcplugin.endOfDirectory(HANDLE)
 
 def list_slovak_tv():
-    # Hlavička (User-Agent), aby si server myslel, že si prehliadač
+    # Hlavičky (User-Agent), aby server JOJ neodmietol spojenie
     ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Safari/537.36"
     headers = f"|User-Agent={ua}&Referer=https://www.joj.sk/"
 
@@ -45,9 +48,10 @@ def list_slovak_tv():
     xbmcplugin.endOfDirectory(HANDLE)
 
 def show_cz_msg():
+    # Opravené zobrazenie správy pre České TV
     xbmcgui.Dialog().ok("TV Free", "Pripravujeme čoskoro!")
 
-# Router
+# --- ROUTER ---
 params = dict(urllib.parse.parse_qsl(sys.argv[2][1:]))
 action = params.get('action')
 
