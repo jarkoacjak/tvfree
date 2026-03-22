@@ -21,6 +21,7 @@ def add_directory_item(label, action, icon=None, is_folder=True, video_url=None)
         list_item.setArt({'icon': icon, 'thumb': icon})
     
     if not is_folder:
+        # Povieme Kodi, že ide o video, ktoré sa dá spustiť
         list_item.setProperty('IsPlayable', 'true')
         list_item.setInfo('video', {'title': label})
 
@@ -33,7 +34,7 @@ def show_main_menu():
     xbmcplugin.endOfDirectory(HANDLE)
 
 def list_slovak_channels():
-    """Zoznam slovenských staníc."""
+    """Zoznam slovenských staníc s tvojimi M3U8 odkazmi."""
     # TV JOJ
     joj_url = "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8"
     joj_logo = "https://upload.wikimedia.org/wikipedia/commons/e/ee/Logo_TV_JOJ_-_2020.svg"
@@ -52,24 +53,23 @@ def list_slovak_channels():
     xbmcplugin.endOfDirectory(HANDLE)
 
 def play_video(stream_url, title):
-    """Spustí video s čistým nastavením hlavičiek."""
-    # User-Agent simulujúci Chrome
-    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+    """Spustí video pomocou vstavaného prehrávača Kodi."""
+    # Definujeme hlavičky pre prehliadač
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Safari/537.36"
+    referer = "https://www.joj.sk/"
     
-    # Skúsime poslať hlavičky oddelene pre vyššiu stabilitu
-    final_url = stream_url + f"|User-Agent={ua}&Referer=https://www.joj.sk/"
+    # Formát pre základný prehrávač Kodi (bez InputStream)
+    # Dôležité: Nepoužívame quote_plus na celú URL, ale len na hodnoty hlavičiek
+    final_url = f"{stream_url}|User-Agent={urllib.parse.quote(user_agent)}&Referer={urllib.parse.quote(referer)}"
     
     list_item = xbmcgui.ListItem(path=final_url)
     list_item.setInfo('video', {'title': title})
     
-    # Nutné pre m3u8 streamy
-    list_item.setProperty('inputstream', 'inputstream.adaptive')
-    list_item.setProperty('inputstream.adaptive.manifest_type', 'hls')
-    
+    # Povieme Kodi, aby tento stream vyriešilo a prehralo
     xbmcplugin.setResolvedUrl(HANDLE, True, list_item)
 
 def show_czech_notice():
-    """Zobrazí tvoj text pre České TV."""
+    """Zobrazí oznam pre České TV."""
     xbmcgui.Dialog().ok("TV Free", "Pripravujeme Čoskoro")
 
 # --- Smerovač (Router) ---
