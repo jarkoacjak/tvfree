@@ -33,7 +33,7 @@ def show_main_menu():
     xbmcplugin.endOfDirectory(HANDLE)
 
 def list_slovak_channels():
-    """Zoznam slovenských staníc vrátane TV Lux."""
+    """Zoznam slovenských staníc vrátane Prima Love."""
     # TV JOJ
     joj_url = "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8"
     joj_logo = "https://yt3.googleusercontent.com/8rPXBoj2l1nhd9C-DCXF-s3tx0i_36GJzJcxeMyYvyPpPNakQsyc5DYc5d_QLDeI74ILkmFSJQ=s900-c-k-c0x00ffffff-no-rj"
@@ -74,7 +74,12 @@ def list_slovak_channels():
     cinema_logo = "http://www.mediaguru.cz/wp-content/uploads/2016/06/Joj-Cinema_akt.png"
     add_directory_item("JOJ Cinema", "play", icon=cinema_logo, is_folder=False, video_url=cinema_url)
 
-    # TV LUX - Nová stanica
+    # PRIMA LOVE - Nová stanica
+    love_url = "http://88.212.15.19/live/prima_love_avc_25p/playlist.m3u8"
+    love_logo = "https://www.recenzer.cz/wp-content/uploads/2023/10/prima-love-logo.jpg"
+    add_directory_item("Prima Love", "play", icon=love_logo, is_folder=False, video_url=love_url)
+
+    # TV LUX
     lux_url = "https://stream.tvlux.sk/luxtv/luxtv-livestream/playlist.m3u8"
     lux_logo = "https://213.sk/wp-content/uploads/2020/11/tvlux.jpg"
     add_directory_item("TV LUX", "play", icon=lux_logo, is_folder=False, video_url=lux_url)
