@@ -8,7 +8,7 @@ HANDLE = int(sys.argv[1])
 BASE_URL = sys.argv[0]
 
 def add_directory_item(label, action, icon=None, is_folder=True, video_url=None):
-    """Vytvorí položku v menu Kodi. Názvy sú po slovensky."""
+    """Vytvorí položku v menu Kodi."""
     query = {'action': action}
     if video_url:
         query['url'] = video_url
@@ -34,7 +34,7 @@ def show_main_menu():
 
 def list_slovak_channels():
     """Zoznam slovenských staníc."""
-    # TV JOJ - OPRAVENÉ LOGO
+    # TV JOJ
     joj_url = "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8"
     joj_logo = "https://yt3.googleusercontent.com/8rPXBoj2l1nhd9C-DCXF-s3tx0i_36GJzJcxeMyYvyPpPNakQsyc5DYc5d_QLDeI74ILkmFSJQ=s900-c-k-c0x00ffffff-no-rj"
     add_directory_item("TV JOJ", "play", icon=joj_logo, is_folder=False, video_url=joj_url)
@@ -99,9 +99,9 @@ def list_slovak_channels():
     lux_logo = "https://213.sk/wp-content/uploads/2020/11/tvlux.jpg"
     add_directory_item("TV LUX", "play", icon=lux_logo, is_folder=False, video_url=lux_url)
 
-    # TV LIPTOV
+    # TV LIPTOV - OPRAVENÉ LOGO
     liptov_url = "http://95.105.255.137:1935/tvturiec/tvliptov.stream/playlist.m3u8"
-    liptov_logo = "https://www.televizialiptov.sk/images/logo.png"
+    liptov_logo = "https://yt3.googleusercontent.com/JJ6maA0dhvLU3z45Jhbgcc1brVZQswuPfYS6Da-Gli4MxXEPlhz5yuLkJlp7VL7mG7eSIxBORA=s900-c-k-c0x00ffffff-no-rj"
     add_directory_item("TV Liptov", "play", icon=liptov_logo, is_folder=False, video_url=liptov_url)
 
     # TV NITRIČKA
@@ -146,14 +146,16 @@ def list_czech_channels():
     xbmcplugin.endOfDirectory(HANDLE)
 
 def play_video(stream_url, title):
-    """Spustí video."""
+    """Spustí video so správnymi hlavičkami."""
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     referer = "https://www.joj.sk/"
     final_url = f"{stream_url}|User-Agent={urllib.parse.quote(user_agent)}&Referer={urllib.parse.quote(referer)}"
+    
     list_item = xbmcgui.ListItem(path=final_url)
     list_item.setInfo('video', {'title': title})
     xbmcplugin.setResolvedUrl(HANDLE, True, list_item)
 
+# --- Router ---
 if __name__ == '__main__':
     params = dict(urllib.parse.parse_qsl(sys.argv[2][1:]))
     action = params.get('action')
