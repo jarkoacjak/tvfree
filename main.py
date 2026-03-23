@@ -34,9 +34,9 @@ def show_main_menu():
 
 def list_slovak_channels():
     """Zoznam slovenských staníc."""
-    # TV JOJ
+    # TV JOJ - OPRAVENÉ LOGO
     joj_url = "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8"
-    joj_logo = "https://img.joj.sk/rx660n/38a52c95-84ce-4c04-b70a-2289a9fd1541"
+    joj_logo = "https://yt3.googleusercontent.com/8rPXBoj2l1nhd9C-DCXF-s3tx0i_36GJzJcxeMyYvyPpPNakQsyc5DYc5d_QLDeI74ILkmFSJQ=s900-c-k-c0x00ffffff-no-rj"
     add_directory_item("TV JOJ", "play", icon=joj_logo, is_folder=False, video_url=joj_url)
 
     # JOJ PLUS
@@ -138,7 +138,7 @@ def list_czech_channels():
     ocko_logo = "https://parasite.cz/wp-content/uploads/2013/02/ocko1.jpg"
     add_directory_item("Óčko", "play", icon=ocko_logo, is_folder=False, video_url=ocko_url)
 
-    # ČT 24 - Nová stanica
+    # ČT 24
     ct24_url = "https://dash2.antik.sk/live/ct24_avc_25p/playlist.m3u8"
     ct24_logo = "https://pecka.tv/wp-content/uploads/2025/12/studio-ct24-400x600.jpg"
     add_directory_item("ČT 24", "play", icon=ct24_logo, is_folder=False, video_url=ct24_url)
@@ -146,22 +146,17 @@ def list_czech_channels():
     xbmcplugin.endOfDirectory(HANDLE)
 
 def play_video(stream_url, title):
-    """Spustí video so simuláciou prehliadača Chrome."""
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+    """Spustí video."""
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     referer = "https://www.joj.sk/"
-    
     final_url = f"{stream_url}|User-Agent={urllib.parse.quote(user_agent)}&Referer={urllib.parse.quote(referer)}"
-    
     list_item = xbmcgui.ListItem(path=final_url)
     list_item.setInfo('video', {'title': title})
-    
     xbmcplugin.setResolvedUrl(HANDLE, True, list_item)
 
-# --- Router ---
 if __name__ == '__main__':
     params = dict(urllib.parse.parse_qsl(sys.argv[2][1:]))
     action = params.get('action')
-
     if action == 'list_sk':
         list_slovak_channels()
     elif action == 'list_cz':
