@@ -36,7 +36,7 @@ def list_slovak_channels():
     """Zoznam slovenských staníc."""
     # TV JOJ
     joj_url = "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8"
-    joj_logo = "https://yt3.googleusercontent.com/8rPXBoj2l1nhd9C-DCXF-s3tx0i_36GJzJcxeMyYvyPpPNakQsyc5DYc5d_QLDeI74ILkmFSJQ=s900-c-k-c0x00ffffff-no-rj"
+    joj_logo = "https://img.joj.sk/rx660n/38a52c95-84ce-4c04-b70a-2289a9fd1541"
     add_directory_item("TV JOJ", "play", icon=joj_logo, is_folder=False, video_url=joj_url)
 
     # JOJ PLUS
@@ -47,7 +47,7 @@ def list_slovak_channels():
     # JOJ KRIMI
     krimi_url = "https://live.cdn.joj.sk/live/andromeda/wau-1080.m3u8"
     krimi_logo = "https://img.telkac.zoznam.sk/data/images/channel/2026/03/04/image_new_137.thumb.png"
-    add_directory_item("JOJ Krimi", "play", icon=krimi_logo, is_folder=False, video_url=krimi_url)
+    add_directory_item("JOJ KRIMI", "play", icon=krimi_logo, is_folder=False, video_url=krimi_url)
 
     # JOJ 24
     joj24_url = "https://live.cdn.joj.sk/live/andromeda/joj_news-1080.m3u8"
@@ -101,7 +101,7 @@ def list_slovak_channels():
 
     # TV LIPTOV
     liptov_url = "http://95.105.255.137:1935/tvturiec/tvliptov.stream/playlist.m3u8"
-    liptov_logo = "https://yt3.googleusercontent.com/JJ6maA0dhvLU3z45Jhbgcc1brVZQswuPfYS6Da-Gli4MxXEPlhz5yuLkJlp7VL7mG7eSIxBORA=s900-c-k-c0x00ffffff-no-rj"
+    liptov_logo = "https://www.televizialiptov.sk/images/logo.png"
     add_directory_item("TV Liptov", "play", icon=liptov_logo, is_folder=False, video_url=liptov_url)
 
     # TV NITRIČKA
@@ -133,10 +133,15 @@ def list_czech_channels():
     minimax_logo = "https://www.minimaxcz.tv/storage/images/cWiGhWyxj8fFnyWQZxEX.png"
     add_directory_item("Minimax", "play", icon=minimax_logo, is_folder=False, video_url=minimax_url)
 
-    # Óčko - Nová stanica
+    # Óčko
     ocko_url = "https://ocko-live-dash.ssl.cdn.cra.cz/cra_live2/ocko.stream.1.smil/playlist.m3u8"
     ocko_logo = "https://parasite.cz/wp-content/uploads/2013/02/ocko1.jpg"
     add_directory_item("Óčko", "play", icon=ocko_logo, is_folder=False, video_url=ocko_url)
+
+    # ČT 24 - Nová stanica
+    ct24_url = "https://dash2.antik.sk/live/ct24_avc_25p/playlist.m3u8"
+    ct24_logo = "https://pecka.tv/wp-content/uploads/2025/12/studio-ct24-400x600.jpg"
+    add_directory_item("ČT 24", "play", icon=ct24_logo, is_folder=False, video_url=ct24_url)
     
     xbmcplugin.endOfDirectory(HANDLE)
 
