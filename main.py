@@ -61,6 +61,10 @@ def list_slovak_channels():
     add_directory_item("TV9", "play", icon="https://www.fotelka.tv/image/cache/catalog/Regionalne/TV9-240x234.jpg", is_folder=False, video_url="https://dash4.antik.sk/live/test_tv9/playlist.m3u8")
     add_directory_item("TV 8", "play", icon="https://www.digislovakia.sk/wp-content/uploads/2023/04/TV8-logo-2-300x231.png", is_folder=False, video_url="http://109.74.145.11:1935/tv8/ngrp:tv8.stream_all/playlist.m3u8")
     add_directory_item("Senzi TV", "play", icon="https://static.wikia.nocookie.net/cstv/images/8/85/Senzi.png", is_folder=False, video_url="https://lb.streaming.sk/senzi/stream/playlist.m3u8")
+    
+    # NOVÁ STANICA: Flow TV
+    add_directory_item("Flow TV", "play", icon="https://www.flowtv.sk/wp-content/uploads/2021/04/logo_flow_tv_web.png", is_folder=False, video_url="https://app.viloud.tv/hls/channel/04e456809c83928443e59f0a2fce8610.m3u8")
+    
     xbmcplugin.endOfDirectory(HANDLE)
 
 def list_czech_channels():
@@ -95,4 +99,4 @@ if __name__ == '__main__':
         xbmcgui.Dialog().notification('PVR', 'Funkcia sa pripravuje...', xbmcgui.NOTIFICATION_INFO, 5000)
     else:
         show_main_menu()
-           
+        
