@@ -48,10 +48,7 @@ def list_slovak_channels():
     add_directory_item("JOJ KRIMI", "play", icon="https://img.telkac.zoznam.sk/data/images/channel/2026/03/04/image_new_137.thumb.png", is_folder=False, video_url="https://live.cdn.joj.sk/live/andromeda/wau-1080.m3u8")
     add_directory_item("JOJ 24", "play", icon="https://img.joj.sk/38a52c95-84ce-4c04-b70a-2289a9fd1541", is_folder=False, video_url="https://live.cdn.joj.sk/live/andromeda/joj_news-1080.m3u8")
     add_directory_item("JOJ Šport", "play", icon="https://img.joj.sk/rx660n/662097da-11c1-434a-a923-3e00cdcb81e7", is_folder=False, video_url="https://live.cdn.joj.sk/live/andromeda/joj_sport-1080.m3u8")
-    
-    # NOVÁ STANICA: JOJ Šport 2
     add_directory_item("JOJ Šport 2", "play", icon="https://static.hnonline.sk/images/slike/2025/12/04/o_4878486_1024.png", is_folder=False, video_url="https://live.cdn.joj.sk/live/andromeda/joj_sport2-1080.m3u8")
-    
     add_directory_item("Jojko", "play", icon="https://i.ibb.co/TxFWhc1J/jojko.png", is_folder=False, video_url="https://live.cdn.joj.sk/live/andromeda/jojko-1080.m3u8")
     add_directory_item("JOJ Family", "play", icon="https://i.ibb.co/hJgjKqpF/joj-family.png", is_folder=False, video_url="https://live.cdn.joj.sk/live/andromeda/family-1080.m3u8")
     add_directory_item("JOJ Cinema", "play", icon="http://www.mediaguru.cz/wp-content/uploads/2016/06/Joj-Cinema_akt.png", is_folder=False, video_url="https://live.cdn.joj.sk/live/andromeda/cinema-1080.m3u8")
@@ -66,7 +63,6 @@ def list_slovak_channels():
     add_directory_item("TV 8", "play", icon="https://www.digislovakia.sk/wp-content/uploads/2023/04/TV8-logo-2-300x231.png", is_folder=False, video_url="http://109.74.145.11:1935/tv8/ngrp:tv8.stream_all/playlist.m3u8")
     add_directory_item("Senzi TV", "play", icon="https://static.wikia.nocookie.net/cstv/images/8/85/Senzi.png", is_folder=False, video_url="https://lb.streaming.sk/senzi/stream/playlist.m3u8")
     add_directory_item("Flow TV", "play", icon="https://www.flowtv.sk/wp-content/uploads/2021/04/logo_flow_tv_web.png", is_folder=False, video_url="https://app.viloud.tv/hls/channel/04e456809c83928443e59f0a2fce8610.m3u8")
-    
     xbmcplugin.endOfDirectory(HANDLE)
 
 def list_czech_channels():
@@ -74,6 +70,10 @@ def list_czech_channels():
     add_directory_item("Minimax", "play", icon="https://www.minimaxcz.tv/storage/images/cWiGhWyxj8fFnyWQZxEX.png", is_folder=False, video_url="http://88.212.15.19/live/test_minimax/playlist.m3u8")
     add_directory_item("Óčko", "play", icon="https://parasite.cz/wp-content/uploads/2013/02/ocko1.jpg", is_folder=False, video_url="https://ocko-live-dash.ssl.cdn.cra.cz/cra_live2/ocko.stream.1.smil/playlist.m3u8")
     add_directory_item("ČT 24", "play", icon="https://pecka.tv/wp-content/uploads/2025/12/studio-ct24-400x600.jpg", is_folder=False, video_url="https://dash2.antik.sk/live/ct24_avc_25p/playlist.m3u8")
+    
+    # NOVÁ STANICA: ČT Sport
+    add_directory_item("ČT Sport", "play", icon="https://www.itelka.sk/wp-content/uploads/2023/04/ct-sport.png", is_folder=False, video_url="http://88.212.15.19/live/test_ctsport_25p/playlist.m3u8")
+    
     xbmcplugin.endOfDirectory(HANDLE)
 
 def play_video(stream_url, title):
@@ -101,4 +101,4 @@ if __name__ == '__main__':
         xbmcgui.Dialog().notification('PVR', 'Funkcia sa pripravuje...', xbmcgui.NOTIFICATION_INFO, 5000)
     else:
         show_main_menu()
-        
+
