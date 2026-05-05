@@ -7,16 +7,18 @@ import xbmcplugin
 import xbmcvfs
 
 # --- Nastavenia ---
+# Jarko, toto sú základné premenné pre fungovanie doplnku
 HANDLE = int(sys.argv[1])
 BASE_URL = sys.argv[0]
-# Cesta, kde sa uloží vygenerovaný playlist
+
+# Cesta k dátam doplnku, kam ukladáme vygenerovaný playlist
 ADDON_DATA_PATH = xbmcvfs.translatePath("special://profile/addon_data/plugin.video.jarko_tv/")
 
 if not xbmcvfs.exists(ADDON_DATA_PATH):
     xbmcvfs.mkdir(ADDON_DATA_PATH)
 
 def add_directory_item(label, action, icon=None, is_folder=True, video_url=None, tvg_id=""):
-    """Vytvorí položku v menu Kodi. tvg_id sa použije pre spárovanie s tvfeeepg.xml."""
+    """Vytvorí položku v menu Kodi. tvg_id musí súhlasiť s ID v tvfeeepg.xml."""
     query = {'action': action}
     if video_url:
         query['url'] = video_url
@@ -30,16 +32,18 @@ def add_directory_item(label, action, icon=None, is_folder=True, video_url=None,
     
     if not is_folder:
         list_item.setProperty('IsPlayable', 'true')
-        # ZMENA: Odstránený plot, aby Kodi uvoľnilo miesto pre EPG dáta
+        # ZMENA: setInfo sme nechali čisté, aby Kodi bralo informácie z tvojho XML
         list_item.setInfo('video', {'title': label})
-        # Dôležité pre PVR klienta:
-        list_item.setProperties({'tvg-id': tvg_id, 'tvg-logo': icon})
+        # DÔLEŽITÉ: Tieto riadky povedia Kodi, ktoré EPG patrí ku ktorému kanálu
+        list_item.setProperty('tvg-id', tvg_id)
+        list_item.setProperty('tvg-logo', icon)
 
     xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=list_item, isFolder=is_folder)
 
-# --- DEFINÍCIA KANÁLOV PRE EPG A PLAYLIST ---
+# --- DEFINÍCIA KANÁLOV ---
+# Jarko, tu si stráž, aby tvg-id bolo presne "JOJ.sk" (ako máš v XML)
 CHANNELS_SK = [
-    ("TV JOJ", "https://yt3.googleusercontent.com/8rPXBoj2l1nhd9C-DCXF-s3tx0i_36GJzJcxeMyYvyPpPNakQsyc5DYc5d_QLDeI74ILkmFSJQ=s900-c-k-c0x00ffffff-no-rj", "JOJ.sk", "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8"),
+    ("TV JOJ", "https://img.joj.sk/logo.png", "JOJ.sk", "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8"),
     ("JOJ Plus", "https://i.ibb.co/21Xx2nnd/joj-plus.png", "JOJPlus.sk", "https://live.cdn.joj.sk/live/andromeda/plus-1080.m3u8"),
     ("JOJ KRIMI", "https://img.telkac.zoznam.sk/data/images/channel/2026/03/04/image_new_137.thumb.png", "JOJKrimi.sk", "https://live.cdn.joj.sk/live/andromeda/wau-1080.m3u8"),
     ("JOJ 24", "https://img.joj.sk/38a52c95-84ce-4c04-b70a-2289a9fd1541", "JOJ24.sk", "https://live.cdn.joj.sk/live/andromeda/joj_news-1080.m3u8"),
@@ -66,74 +70,64 @@ CHANNELS_CZ = [
     ("ČT 24", "https://pecka.tv/wp-content/uploads/2025/12/studio-ct24-400x600.jpg", "CT24.cz", "https://dash2.antik.sk/live/ct24_avc_25p/playlist.m3u8")
 ]
 
-# --- FUNKCIE PRE PVR A EPG ---
+# --- FUNKCIE PRE PLAYLIST ---
 
 def setup_pvr_playlist():
-    """Vytvorí .m3u súbor s EPG tagmi."""
+    """Vygeneruje .m3u súbor, ktorý si Jarko vloží do IPTV Simple Clienta."""
     m3u_path = os.path.join(ADDON_DATA_PATH, "playlist.m3u")
     try:
         with open(m3u_path, "w", encoding="utf-8") as f:
             f.write("#EXTM3U\n")
             all_channels = CHANNELS_SK + CHANNELS_CZ
             for name, logo, tid, url in all_channels:
+                # Tu zapisujeme metaúdaje pre PVR klienta
                 f.write(f'#EXTINF:-1 tvg-id="{tid}" tvg-logo="{logo}",{name}\n{url}\n')
-        xbmcgui.Dialog().ok("PVR Playlist", f"Playlist bol vygenerovaný!\nCesta: {m3u_path}\n\nTeraz ho vložte do PVR IPTV Simple Client.")
+        xbmcgui.Dialog().ok("Playlist Hotový", f"Súbor nájdeš tu:\n{m3u_path}")
     except Exception as e:
-        xbmcgui.Dialog().error("Chyba", f"Nepodarilo sa vytvoriť playlist: {str(e)}")
+        xbmcgui.Dialog().error("Chyba", str(e))
 
-def setup_pvr_epg():
-    """Zobrazí adresu pre tvoj ručný EPG súbor."""
-    # Tu si môžeš pripomenúť názov tvojho súboru
-    xbmcgui.Dialog().ok("EPG Nastavenie", "V PVR IPTV Simple Client nastav cestu k tvojmu súboru:\ntvfeeepg.xml")
-
-# --- MENU STRUKTÚRA ---
+# --- MENU ---
 
 def show_main_menu():
-    add_directory_item("Živé vysielania", "live_menu", is_folder=True)
-    add_directory_item("Nastaviť playlist do PVR IPTV Simple Client", "set_pvr_playlist", is_folder=False)
-    add_directory_item("Info k tvfeeepg.xml", "set_pvr_epg", is_folder=False)
+    add_directory_item("Živé vysielanie", "live_menu", is_folder=True)
+    add_directory_item("Vytvoriť Playlist pre PVR", "set_pvr_playlist", is_folder=False)
     xbmcplugin.endOfDirectory(HANDLE)
 
 def show_live_menu():
-    add_directory_item("Slovenské TV", "list_sk", is_folder=True)
-    add_directory_item("České TV", "list_cz", is_folder=True)
+    add_directory_item("Slovenské kanály", "list_sk", is_folder=True)
+    add_directory_item("České kanály", "list_cz", is_folder=True)
     xbmcplugin.endOfDirectory(HANDLE)
 
-def list_slovak_channels():
-    for name, logo, tid, url in CHANNELS_SK:
-        add_directory_item(name, "play", icon=logo, is_folder=False, video_url=url, tvg_id=tid)
-    xbmcplugin.endOfDirectory(HANDLE)
-
-def list_czech_channels():
-    for name, logo, tid, url in CHANNELS_CZ:
+def list_channels(channel_list):
+    for name, logo, tid, url in channel_list:
         add_directory_item(name, "play", icon=logo, is_folder=False, video_url=url, tvg_id=tid)
     xbmcplugin.endOfDirectory(HANDLE)
 
 def play_video(stream_url, title):
+    # Pridávame hlavičky, aby streamy (napr. JOJ) fungovali
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     referer = "https://www.joj.sk/"
     final_url = f"{stream_url}|User-Agent={urllib.parse.quote(user_agent)}&Referer={urllib.parse.quote(referer)}"
+    
     list_item = xbmcgui.ListItem(path=final_url)
     list_item.setInfo('video', {'title': title})
     xbmcplugin.setResolvedUrl(HANDLE, True, list_item)
 
-# --- Router ---
+# --- Spúšťač ---
 if __name__ == '__main__':
     params = dict(urllib.parse.parse_qsl(sys.argv[2][1:]))
     action = params.get('action')
+    
     if action == 'live_menu':
         show_live_menu()
     elif action == 'list_sk':
-        list_slovak_channels()
+        list_channels(CHANNELS_SK)
     elif action == 'list_cz':
-        list_czech_channels()
+        list_channels(CHANNELS_CZ)
     elif action == 'set_pvr_playlist':
         setup_pvr_playlist()
-    elif action == 'set_pvr_epg':
-        setup_pvr_epg()
     elif action == 'play':
         play_video(params.get('url'), params.get('title'))
     else:
         show_main_menu()
-
 
