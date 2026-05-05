@@ -7,18 +7,16 @@ import xbmcplugin
 import xbmcvfs
 
 # --- Nastavenia ---
-# Jarko, toto sú základné premenné pre fungovanie doplnku
 HANDLE = int(sys.argv[1])
 BASE_URL = sys.argv[0]
 
-# Cesta k dátam doplnku, kam ukladáme vygenerovaný playlist
-ADDON_DATA_PATH = xbmcvfs.translatePath("special://profile/addon_data/plugin.video.jarko_tv/")
+# Jarko, zmenené na tvoj názov tv_free
+ADDON_DATA_PATH = xbmcvfs.translatePath("special://profile/addon_data/plugin.video.tv_free/")
 
 if not xbmcvfs.exists(ADDON_DATA_PATH):
     xbmcvfs.mkdir(ADDON_DATA_PATH)
 
 def add_directory_item(label, action, icon=None, is_folder=True, video_url=None, tvg_id=""):
-    """Vytvorí položku v menu Kodi. tvg_id musí súhlasiť s ID v tvfeeepg.xml."""
     query = {'action': action}
     if video_url:
         query['url'] = video_url
@@ -32,16 +30,13 @@ def add_directory_item(label, action, icon=None, is_folder=True, video_url=None,
     
     if not is_folder:
         list_item.setProperty('IsPlayable', 'true')
-        # ZMENA: setInfo sme nechali čisté, aby Kodi bralo informácie z tvojho XML
         list_item.setInfo('video', {'title': label})
-        # DÔLEŽITÉ: Tieto riadky povedia Kodi, ktoré EPG patrí ku ktorému kanálu
         list_item.setProperty('tvg-id', tvg_id)
         list_item.setProperty('tvg-logo', icon)
 
     xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=list_item, isFolder=is_folder)
 
 # --- DEFINÍCIA KANÁLOV ---
-# Jarko, tu si stráž, aby tvg-id bolo presne "JOJ.sk" (ako máš v XML)
 CHANNELS_SK = [
     ("TV JOJ", "https://img.joj.sk/logo.png", "JOJ.sk", "https://live.cdn.joj.sk/live/andromeda/joj-1080.m3u8"),
     ("JOJ Plus", "https://i.ibb.co/21Xx2nnd/joj-plus.png", "JOJPlus.sk", "https://live.cdn.joj.sk/live/andromeda/plus-1080.m3u8"),
@@ -73,14 +68,13 @@ CHANNELS_CZ = [
 # --- FUNKCIE PRE PLAYLIST ---
 
 def setup_pvr_playlist():
-    """Vygeneruje .m3u súbor, ktorý si Jarko vloží do IPTV Simple Clienta."""
+    """Vygeneruje .m3u súbor pre IPTV Simple Client."""
     m3u_path = os.path.join(ADDON_DATA_PATH, "playlist.m3u")
     try:
         with open(m3u_path, "w", encoding="utf-8") as f:
             f.write("#EXTM3U\n")
             all_channels = CHANNELS_SK + CHANNELS_CZ
             for name, logo, tid, url in all_channels:
-                # Tu zapisujeme metaúdaje pre PVR klienta
                 f.write(f'#EXTINF:-1 tvg-id="{tid}" tvg-logo="{logo}",{name}\n{url}\n')
         xbmcgui.Dialog().ok("Playlist Hotový", f"Súbor nájdeš tu:\n{m3u_path}")
     except Exception as e:
@@ -104,7 +98,6 @@ def list_channels(channel_list):
     xbmcplugin.endOfDirectory(HANDLE)
 
 def play_video(stream_url, title):
-    # Pridávame hlavičky, aby streamy (napr. JOJ) fungovali
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     referer = "https://www.joj.sk/"
     final_url = f"{stream_url}|User-Agent={urllib.parse.quote(user_agent)}&Referer={urllib.parse.quote(referer)}"
@@ -113,7 +106,6 @@ def play_video(stream_url, title):
     list_item.setInfo('video', {'title': title})
     xbmcplugin.setResolvedUrl(HANDLE, True, list_item)
 
-# --- Spúšťač ---
 if __name__ == '__main__':
     params = dict(urllib.parse.parse_qsl(sys.argv[2][1:]))
     action = params.get('action')
